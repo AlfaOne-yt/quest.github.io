@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Python dans le navigateur</title>
+</head>
+<body>
+    <h1>Exécution Python avec Pyodide 😎</h1>
+    <button onclick="runPython()">Lancer le Python</button>
+
+    <pre id="output"></pre>
+
+    <!-- Librairie Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.0/full/pyodide.js"></script>
+
+    <script>
+        async function runPython() {
+            const pyodide = await loadPyodide();
+
+            // Récupérer le fichier Python depuis GitHub
+              let code = await (await fetch("https://raw.githubusercontent.com/alfaone-yt/quest/main/login_beta.py")).text();
+
+            // Exécuter le code Python
+            let result = await pyodide.runPythonAsync(`
+import sys
+from js import document
+output = ""
+def print_hook(*args):
+    global output
+    output += " ".join(map(str, args)) + "\\n"
+print = print_hook
+
+${code}
+
+output
+            `);
+
+            // Afficher le résultat dans la page
+            document.getElementById("output").innerText = result;
+        }
+    </script>
+</body>
+</html>
